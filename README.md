@@ -24,7 +24,7 @@ Clean Code prensiplerine uygun olarak geliştirilmiş, PostgreSQL veritabanı il
   ## Kurulum
   1. **Repository’yi klonlayın:** 
   ```bash
-  git clone https://github.com/<kullanici-adi>/<repo-adi>.git
+  git clone https://github.com/OgulcanOnder/spring-boot-crud-example.git
   cd <spring-boot-crud-example>
   ```
   
