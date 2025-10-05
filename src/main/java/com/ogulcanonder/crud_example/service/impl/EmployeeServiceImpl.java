@@ -2,6 +2,8 @@ package com.ogulcanonder.crud_example.service.impl;
 
 import com.ogulcanonder.crud_example.dto.DtoEmployee;
 import com.ogulcanonder.crud_example.entities.Employee;
+import com.ogulcanonder.crud_example.exception.EmailNotUniqueException;
+import com.ogulcanonder.crud_example.exception.EmployeeNotFoundException;
 import com.ogulcanonder.crud_example.mapper.EmployeeMapper;
 import com.ogulcanonder.crud_example.repository.EmployeeRepository;
 import com.ogulcanonder.crud_example.service.IEmployeeService;
@@ -23,7 +25,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public DtoEmployee saveEmployee(DtoEmployee dtoEmployee) {
         if (employeeRepository.existsByEmail(dtoEmployee.getEmail())){
-            throw new RuntimeException("This Email Not Unique");
+            throw new EmailNotUniqueException("This Email Not Unique");
         }
         Employee employee=employeeMapper.toEntity(dtoEmployee);
         Employee savedEmployee=employeeRepository.save(employee);
@@ -33,8 +35,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public List<DtoEmployee> getAllEmployee() {
         List<Employee> employeeList=employeeRepository.findAll();
-        if (employeeList==null){
-            throw new RuntimeException("Employee Not Found.");
+        if (employeeList.isEmpty()){
+            throw new EmployeeNotFoundException("Employee Not Found.");
         }
         return employeeMapper.toDtoList(employeeList);
     }
@@ -42,14 +44,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public DtoEmployee findByEmployee(Long id) {
         Employee employee=employeeRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("This Employee Not Found."));
+                .orElseThrow(()-> new EmployeeNotFoundException("This Employee Not Found."));
         return employeeMapper.toDto(employee);
     }
 
     @Override
     public DtoEmployee updateEmployee(DtoEmployee dtoEmployee, Long id) {
         Employee employee=employeeRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("This Employee Not Found"));
+                .orElseThrow(()->new EmployeeNotFoundException("This Employee Not Found"));
         updateIfNotEmpty(dtoEmployee.getName(), employee::setName);
         updateIfNotEmpty(dtoEmployee.getSurname(),employee::setSurname);
         updateIfNotEmpty(dtoEmployee.getEmail(),employee::setEmail);
@@ -61,7 +63,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public String deleteEmployee(Long id) {
         Employee employee=employeeRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("This Employee Not Found"));
+                .orElseThrow(()->new EmployeeNotFoundException("This Employee Not Found"));
         employeeRepository.delete(employee);
 
         return "Employee with ID " +employee.getId()+ " has been deleted successfully.";
